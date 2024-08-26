@@ -61,7 +61,7 @@ def create_prompt_template():
     return template
 
 def main():
-    st.title("FAQ Chatbot with Streamlit and Buffer Memory")
+    st.title("PG&E Virtual Assistant")
     if "messages" not in st.session_state:
         st.session_state.messages = []
         st.session_state.memory = ConversationBufferMemory(memory_key="chat_history", return_messages=True)
