@@ -1,0 +1,8 @@
+
+env/
+env*/
+__pycache__/
+*.py[cod]
+*.pyo
+chromedriver-win64/
+.env
