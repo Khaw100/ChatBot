@@ -6,3 +6,4 @@ __pycache__/
 *.pyo
 chromedriver-win64/
 .env
+.streamlit/

@@ -8,9 +8,12 @@ import google.generativeai as genai
 import os
 from dotenv import load_dotenv
 
+
 load_dotenv() 
-GOOGLE_API_KEY = os.getenv('GOOGLE_API_KEY')
+GOOGLE_API_KEY = st.secrets.get("GOOGLE_API_KEY") or os.getenv('GOOGLE_API_KEY')
+
 genai.configure(api_key=GOOGLE_API_KEY)
+
 
 @st.cache_resource
 def load_llm_and_embeddings(embedding_model_name="sentence-transformers/all-MiniLM-L6-v2"):
@@ -53,6 +56,7 @@ def create_prompt_template():
     If the context does not contain the relevant information, politely decline to answer and suggest visiting the Bill FAQs page for more details.
 
     Context:
+    Hello, I am a virtual assistant for PG&E, specifically designed to assist with Bill FAQs
     {context}
 
     Question: {question}
@@ -61,18 +65,18 @@ def create_prompt_template():
     """
     return template
 
+chat, embeddings = load_llm_and_embeddings()
+faq_df = load_faq_data('FAQ.txt')
+vector_store = create_vector_store_from_faq(faq_df, embeddings)
+retriever = vector_store.as_retriever()
+prompt_template = create_prompt_template()
+
 def main():
     st.title("PG&E Virtual Assistant")
     
     if "messages" not in st.session_state:
         st.session_state.messages = []
         st.session_state.memory = ConversationBufferMemory(memory_key="chat_history", return_messages=True)
-    
-    chat, embeddings = load_llm_and_embeddings()
-    faq_df = load_faq_data('FAQ.txt')
-    vector_store = create_vector_store_from_faq(faq_df, embeddings)
-    retriever = vector_store.as_retriever()
-    prompt_template = create_prompt_template()
     
     for message in st.session_state.messages:
         with st.chat_message(message["role"]):
